@@ -1,0 +1,26 @@
+###CREATE A NEW NOTE
+POST http://localhost:3000/notes
+Content-Type: application/json
+
+{
+  "title": "My First Note",
+  "content": "I am currently learning backend development"
+}
+
+###GET ALL NOTES
+GET http://localhost:3000/notes
+
+###GET A NOTE BY ID
+GET http://localhost:3000/notes/1
+
+###UPDATE A NOTE BY ID
+PUT http://localhost:3000/notes/1
+Content-Type: application/json
+
+{
+  "title": "Second Note",
+  "content": "I am a software developer with strong background in full stack development"
+}
+
+###DELETE A NOTE BY ID  
+DELETE http://localhost:3000/notes/1

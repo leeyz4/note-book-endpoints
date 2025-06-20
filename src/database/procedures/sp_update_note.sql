@@ -15,17 +15,18 @@ BEGIN
         RAISE EXCEPTION 'Note with ID % not found', p_id;
     END IF;
 
-    -- Check if the title already exists for another note
-    IF EXISTS (SELECT 1 FROM note WHERE title = p_title AND id != p_id) THEN
-        RAISE EXCEPTION 'note with title % already exists', p_title;
-    END IF;
-
-    -- Update the note details
-    RETURN QUERY
-    UPDATEs note SET 
+ -- Update the note details
+     UPDATE notes
+    SET
         title = p_title,
-        content = p_content
-    WHERE note.id = p_id
-    RETURNING note.id, note.title, note.content, note.created_at;
+        content = p_content,
+        updated_at = NOW()
+    WHERE id = p_id;
+
+    RETURN QUERY
+    SELECT id, title, content, created_at, updated_at
+    FROM notes
+    WHERE id = p_id;
 END;
 $$ LANGUAGE plpgsql;
+

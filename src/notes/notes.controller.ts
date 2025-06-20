@@ -9,7 +9,6 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query,
 } from '@nestjs/common';
 import { NoteService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
@@ -34,7 +33,7 @@ export class NoteController {
     } catch (error) {
       return {
         success: false,
-        message: 'Failed to create book',
+        message: 'Failed to create note',
         error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
@@ -78,26 +77,6 @@ export class NoteController {
     }
   }
 
-  @Get('search')
-  async findByTitle(
-    @Query('title') title: string,
-  ): Promise<ApiResponse<Note[]>> {
-    try {
-      const note = await this.noteService.findByTitle(title);
-      return {
-        success: true,
-        message: `Note with title "${title}" retrieved successfully`,
-        data: note,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: `Failed to retrieve note with title  "${title}"`,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
-  }
-
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -122,13 +101,14 @@ export class NoteController {
   @Delete(':id')
   async delete(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<ApiResponse<{ message: void }>> {
+  ): Promise<ApiResponse<string>> {
     try {
-      const result = await this.noteService.remove(id);
+      const result = await this.noteService.delete(id);
+      const message = typeof result === 'string' ? result : result.message;
       return {
         success: true,
         message: `Note with ID ${id} deleted successfully`,
-        data: { message: result },
+        data: message,
       };
     } catch (error) {
       return {

@@ -1,39 +1,38 @@
-    CREATE OR REPLACE FUNCTION sp_get_all_note()
-    RETURNS SET OF NOTE AS $$
+   CREATE OR REPLACE FUNCTION sp_get_all_note()
+   RETURNS TABLE(
+    id INTEGER,
+    title VARCHAR(255),
+)
+   RETURNS TABLE(
+    id INTEGER,
+    title VARCHAR(255),
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+) AS $$
 BEGIN
-    RETURN QUERY
-    SELECT * FROM note ORDER BY id;
-END;
-$$ LANGUAGE plpgsql;
+     IF EXISTS (SELECT 1 FROM users WHERE notes.title = p_title) THEN
+        RAISE EXCEPTION ' NOtes with title % already exists', p_title;
+    END IF;
 
- CREATE OR REPLACE FUNCTION sp_get_all_note()
-    RETURNS SET OF NOTE AS $$
-BEGIN
     RETURN QUERY
-    SELECT * FROM note ORDER BY id DESC;
-END;
-$$ LANGUAGE plpgsql;
+    INSERT INTO users (title, content, created_at)
+    VALUES(p_title, p_content p_created_at)
+    RETURNING notes.id, notes.title, notes.content, notes.created_at, notes.updated_at;
+    END;
+    $$ language plpgsql;
 
 CREATE OR REPLACE FUNCTION sp_get_note(p_id INT)
-RETURNS SET OF NOTE AS $$
+RETURNS TABLE(
+    id INTEGER,
+    title VARCHAR(255),
+    content VARCHAR(255),
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+) AS $$
 BEGIN
     RETURN QUERY
-    SELECT * FROM note WHERE id = p_id;
-
-    IF NOT FOUND THEN
-        RAISE EXCEPTION 'note with ID % not found', p_id;
-    END IF;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION sp_get_note_with_title(p_title VARCHAR(100))
-    RETURNS SET OF note AS $$
-BEGIN
-    RETURN QUERY
-    SELECT * FROM note WHERE title = p_title;
-
-    IF NOT FOUND THEN
-        RAISE EXCEPTION ' note with title % not found', p_title;
-    END IF;
+    SELECT id, title, content, created_at, updated_at
+    FROM notes
+    WHERE id = p_id;
 END;
 $$ LANGUAGE plpgsql;
